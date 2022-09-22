@@ -1,1 +1,188 @@
-# Lazerpay Go SDK
+# Go API client for Lazerpay crypto payment
+
+This is a Go client for interacting with the lazerpay API for quick crypto payments for businesses
+
+## Installation
+
+```shell
+    go get github.com/oj-lewis/lazerpay-go
+```
+
+## Usage
+
+```Go
+    import (
+        "context"
+        "log"
+        "os"
+        "encoding/json"
+
+        "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+    func main() {
+        // create a new lazerpay instance
+        c, err := lazerpay.New("secretkey")
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
+```
+
+## Availabe Methods on the sdk
+
+**1**. **Payments**
+- Initialize Payment
+- Verify Payment
+
+**2**. **Payout**
+- Crypto Payout 
+- Bank Payout
+
+**3**. **Swap**
+- Crypto Swap 
+- Get Crypto swap amount out
+
+**4**. **Payment Links**
+- Create payment links 
+- Get all payment links
+- Update payment links
+- Get a single payment link
+
+## Payment
+
+#### `Initialize Payment`
+This describes how to initiate a payment foy your 
+customer
+
+```Go
+import (
+    "log"
+
+    "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+func main() {
+     // create a new lazerpay instance
+    lazerpay, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    payment_tx := &PaymentOption{
+	    Reference: "YOUR REFERENCE", 
+	    CustomerName: "John Doe",         	
+	    CustomerEmail: "johndoe@example.com",
+	    Coin: "USDT", // DAI, BUSD, USDT or USDC
+	    Currency: "USD", // USD, NGN, GBP, EUR
+	    Amount: 100,
+	    AcceptPartialPayment: true, // defaults to false	 	
+    } 
+    resp, _, err := lazerpay.Payment.Initialize(payment_tx)
+    if err != nil {
+        log.Fatal(err)
+    }
+} 
+```
+
+
+#### `Verify Payment`
+This describes how to verify an initialized payment
+
+```Go
+import (
+    "log"
+
+    "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+func main() {
+     // create a new lazerpay instance
+    lazerpay, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    id := "the id generated from initializing the payment"
+    
+    resp, _, err := lazerpay.Payment.Verify(id)
+    if err != nil {
+        log.Fatal(err)
+    }
+} 
+```
+
+
+## Payout
+
+#### `Crypto Payout`
+This describes how to withdraw the crypto in thier lazerpay balance.
+
+```Go
+import (
+    "log"
+
+    "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+func main() {
+     // create a new lazerpay instance
+    lazerpay, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    payout_tx := &CrptoPayoutOptions{
+	    Reference: "YOUR REFERENCE", 
+	    Coin: "USDT", // DAI, BUSD, USDT or USDC
+	    Amount: 100,
+        Recipient: "THE ADDRESS OF THE RECIPIENT",
+        Blockchain: "Binance Smart Chain",
+	    	 	
+    } 
+    resp, _, err := lazerpay.Payout.Crypto(payout_tx)
+    if err != nil {
+        log.Fatal(err)
+    }
+} 
+```
+
+#### `Bank Payout`
+This describes how to withdraw the crypto in thier lazerpay balance to their bank accounts.
+
+```Go
+import (
+    "log"
+
+    "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+func main() {
+     // create a new lazerpay instance
+    lazerpay, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    payout_tx := &BankPayoutOptions{
+	    BankName: "Kuda Bank",
+        BankCode: "KUDA BANK CODE",
+        AccountName:"YOUR ACCOUNT NAME",
+        AccountNumber: "YOUR ACCOUNT NUMBER",
+        Currency: "NGN"
+        Country: "Nigeria"
+        Default: true
+    } 
+
+    // creates a new payout bank
+    resp, _, err := lazerpay.Payout.Create(payout_tx)
+    if err != nil {
+        log.Fatal(err)
+    }
+} 
+```
