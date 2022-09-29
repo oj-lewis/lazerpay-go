@@ -38,30 +38,40 @@ const (
 
 // SwapCrypto: swaps one coin to another
 // @params {options}: swap options
-func (s Swapservice)  SwapCrypto(options SwapOptions) (*SwapResponse, *http.Response, error ) {
+func (s Swapservice)  SwapCrypto(options SwapOptions) (*SwapResponse, error ) {
 	url := fmt.Sprintf(s.baseUrl + "%s/crypto", swapCryptoEndpoint)
 	if options.Reference == "" {
-		options.Reference = RandomString(12)
+		options.Reference = randomString(12)
 	}
-	var swapRes = new(SwapResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &swapRes)
+	var swap = new(SwapResponse)
+	
+	req, err := s.Client.newRequest(http.MethodPost, url, options, s.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return swapRes, resp, nil
+	if err := do(req, &swap); err != nil {
+		return nil, err
+	}
+	 
+	return swap, nil
 }
 
 // GetSwapAmout: retuns the amount to be recieved on swap
 // @params {options}: swap options
-func (s Swapservice) GetSwapAmount(options SwapOptions) (*SwapAmountResponse, *http.Response, error) {
+func (s Swapservice) GetSwapAmount(options SwapOptions) (*SwapAmountResponse, error) {
 	url := fmt.Sprintf(s.baseUrl + "%s/crypto/amount-out", swapCryptoEndpoint)
 	
-	var swapRes = new(SwapAmountResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &swapRes)
+	var swap = new(SwapAmountResponse)
+	
+	req, err := s.Client.newRequest(http.MethodPost, url, options, s.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return swapRes, resp, nil
+	if err := do(req, &swap); err != nil {
+		return nil, err
+	}
+	 
+	return swap, nil
 }

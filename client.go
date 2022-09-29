@@ -16,10 +16,11 @@ const (
 type Client struct {
 	baseUrl      string
 	secretKey    string
+	publicKey     string
 
 	Payment      *PaymentService
 	PaymentLink  *PaymentLinkService
-	Transfers    *PayoutService
+	Payout    *PayoutService
 	Swap         *Swapservice
 }
 
@@ -35,10 +36,11 @@ type service struct{
 
 //NewClient: Creates a new instance of lazerpay client
 //@params {secretKey}: A unique secret token for interacting with the lazerpay api
-func NewClient(secretKey string) (*Client, error) {
+func NewClient(publicKey, secretKey string) (*Client, error) {
 	c := new(Client)
 
 	c.secretKey = secretKey
+	c.publicKey = publicKey
 	c.serviceSetup()
 
 	return c, c.validate()
@@ -48,7 +50,7 @@ func NewClient(secretKey string) (*Client, error) {
 func (c *Client) serviceSetup() {
 	c.Payment       = &PaymentService{c}
 	c.PaymentLink   = &PaymentLinkService{c}
-	c.Transfers     = &PayoutService{c}
+	c.Payout     = &PayoutService{c}
 	c.Swap          = &Swapservice{c}
 	c.setBaseUrl()
 }
@@ -75,17 +77,15 @@ func (c *Client) setBaseUrl() {
 // @params {_url} : The url of the request,
 // @params {payload} : The body of the request,
 // @params {v} : The body of the response is pointed to v
-func newRequest(method string, _url string, payload, v interface{}) (*http.Response, error) {
-	c := &Client{}
+func (c *Client) newRequest(method string, _url string, payload any, apiKey string) (*http.Request, error) {
 	if strings.HasPrefix(_url, "/") {
 		return nil, errors.New("url should not start wth /")
 	}
 
 	var _body = bytes.NewBuffer(nil)
 	if payload != nil {
-		if err := json.NewEncoder(_body).Encode(payload); err != nil {
-			return nil, err
-		}
+		jsonbody, _ := json.Marshal(payload)
+		_body = bytes.NewBuffer(jsonbody)
 	}
 	req, err := http.NewRequest(method, _url, _body)
 	if err != nil {
@@ -95,40 +95,50 @@ func newRequest(method string, _url string, payload, v interface{}) (*http.Respo
 	if payload != nil {
 		req.Header.Add("Content-Type", "application/json")
 	}
-	req.Header.Add("Authorization", "Bearer" + c.secretKey)
+
+	if apiKey == c.publicKey {
+		req.Header.Set("x-api-key", c.publicKey)
+	} else {
+		req.Header.Add("Authorization", "Bearer " + c.secretKey)
+	}
+	
+	return req, nil
+}
+
+func do(req *http.Request, v any) (error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	
 	defer resp.Body.Close()
 	
 	if n := resp.StatusCode; n != http.StatusOK && n != http.StatusCreated {
 		var d struct {
-			Message string `json:"maessage"`
+			StatusCode int  `json:"statusCode"`
+			Message string `json:"message"`
+			Status string `json:"status"`
 		}
-
 		if err := json.NewDecoder(resp.Body).Decode(&d); err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, errors.New(d.Message)
+		return errors.New(d.Message)
 	}
 
 	if v != nil {
 		if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
-			return nil, err
+			return err
 		}
 
 	}
 
-	return resp, nil
+	return nil
 }
 
 // RandomString generates a random string with a specific size s
-func RandomString(s int) (string) {
+func randomString(s int) (string) {
 	letters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
 	bytes := make([]byte, s)
