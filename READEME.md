@@ -12,18 +12,15 @@ This is a Go client for interacting with the lazerpay API for quick crypto payme
 
 ```Go
     import (
-        "context"
         "log"
-        "os"
-        "encoding/json"
-
+        
         "github.com/oj-lewis/lazerpay-go/pkg"
     )
 
 
     func main() {
         // create a new lazerpay instance
-        c, err := lazerpay.New("secretkey")
+        c, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
         if err != nil {
             log.Fatal(err)
         }
@@ -140,7 +137,7 @@ func main() {
 	    Reference: "YOUR REFERENCE", 
 	    Coin: "USDT", // DAI, BUSD, USDT or USDC
 	    Amount: 100,
-        Recipient: "THE ADDRESS OF THE RECIPIENT",
+        Recipient: "THE CRYPTO ADDRESS OF THE RECIPIENT",
         Blockchain: "Binance Smart Chain",
 	    	 	
     } 
@@ -169,14 +166,14 @@ func main() {
         log.Fatal(err)
     }
 
-    payout_tx := &BankPayoutOptions{
+    payout_tx := &BankOptions{
 	    BankName: "Kuda Bank",
         BankCode: "KUDA BANK CODE",
-        AccountName:"YOUR ACCOUNT NAME",
-        AccountNumber: "YOUR ACCOUNT NUMBER",
-        Currency: "NGN"
-        Country: "Nigeria"
-        Default: true
+        AccountName:"JOHN DOE",
+        AccountNumber: "1234567890",
+        Currency: "NGN",
+        Country: "Nigeria",
+        Default: true,
     } 
 
     // creates a new payout bank
@@ -186,3 +183,39 @@ func main() {
     }
 } 
 ```
+```Go
+import (
+    "log"
+
+    "github.com/oj-lewis/lazerpay-go/pkg"
+    )
+
+
+func main() {
+     // create a new lazerpay instance
+    lazerpay, err := lazerpay.NewClient(LAZERPAY_PUBLIC_KEY, LAZERPAY_SECRET_KEY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    initiate_tx := &PayoutOptions{
+	    BankId: "",
+        COIN: "USDT",
+        Amount: 100,
+    } 
+
+    // initiates a new bank payout
+    resp, _, err := lazerpay.Payout.Initiate(initiate_tx)
+    if err != nil {
+        log.Fatal(err)
+    }
+} 
+```
+
+## Author 
+
+- Omiete John-lewis 
+- Contact on twitter [@the_ojlewis](https://twitter.com/the_ojlewis)
+
+## Contribution
+Contributions are welcome if there is an issue you can a new issue or create a pull request

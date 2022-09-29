@@ -57,31 +57,38 @@ const (
 
 // Create: create a new standrad payment link
 // @params {options}: the required options to create a payment link
-func (p *PaymentLinkService) Create(options LinkOptions) (*LinkResponse, *http.Response, error ) {
+func (p *PaymentLinkService) Create(options LinkOptions) (*LinkResponse, error ) {
 	url := fmt.Sprintf(p.baseUrl + "%s/standard", paymentLinkEndpoint)
 
-	var linkRes = new(LinkResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &linkRes)
+	var link = new(LinkResponse)
+	req, err := p.Client.newRequest(http.MethodPost, url, options, p.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
+	}
+
+	if err := do(req, &link); err != nil {
+		return nil, err
 	}
 	 
-	return linkRes, resp, nil
+	return link, nil
 }
 
 // Update: updates a standrad payment link
 // @params {options}: the required options to be updated
-func (p *PaymentLinkService) Update(options LinkOptions) (*LinkResponse, *http.Response, error) {
+func (p *PaymentLinkService) Update(options LinkOptions) (*LinkResponse, error) {
 	url := fmt.Sprintf(p.baseUrl + "%s/standard", paymentLinkEndpoint)
 	
-	
-	var linkres = new(LinkResponse)
-	resp, err := newRequest(http.MethodPut, url, options, &linkres)
+	var link = new(LinkResponse)
+	req, err := p.Client.newRequest(http.MethodPut, url, options, p.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return linkres, resp, nil	
+	if err := do(req, &link); err != nil {
+		return nil, err
+	}
+	 
+	return link, nil	
 }
 
 type ListLinksResponse struct {
@@ -108,29 +115,35 @@ type ListLinksResponse struct {
 }
 
 // GetAll: gets all available payment links
-func (p *PaymentLinkService) GetAll() (*ListLinksResponse, *http.Response, error ) {
+func (p *PaymentLinkService) GetAll() (*ListLinksResponse, error ) {
 	url := fmt.Sprintf(p.baseUrl + "%s", paymentLinkEndpoint)
 
-	var linksRes *ListLinksResponse
-	resp, err := newRequest(http.MethodGet, url, nil, &linksRes)
+	var link = new(ListLinksResponse)
+	req, err := p.Client.newRequest(http.MethodPost, url, nil, p.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return linksRes, resp, nil
+	if err := do(req, &link); err != nil {
+		return nil, err
+	}
+	 
+	return link, nil
 }
 
 // Get: gets a payment link either by id or by slug
-func (p *PaymentLinkService) Get(identifier string) (*LinkResponse, *http.Response, error) {
-	url := fmt.Sprintf(p.baseUrl + "%s/pay/%s", paymentLinkEndpoint, identifier)
+func (p *PaymentLinkService) Get(identifier string) (*LinkResponse, error) {
+	url := fmt.Sprintf(p.Client.baseUrl + "%s/pay/%s", paymentLinkEndpoint, identifier)
 
-	var linkRes = new(LinkResponse)
-	resp, err := newRequest(http.MethodGet, url, nil, &linkRes)
+	var link = new(LinkResponse)
+	req, err := p.Client.newRequest(http.MethodPost, url, nil, p.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return linkRes, resp, nil
+	if err := do(req, &link); err != nil {
+		return nil, err
+	}
+	 
+	return link, nil
 }
-
-

@@ -21,25 +21,26 @@ type paymentData struct {
 	Currency             	string 	`json:"currency"`
 	FiatAmount            	float64 `json:"fiatAmount"`
 	FeeInCrypto            	float64 `json:"feeInCrypto"`
-	Network            		float64 `json:"network"`
+	Network            		string  `json:"network"`
 	AcceptPartialPayment 	bool   	`json:"accept_partial_payment"`
 }
 
 type PaymentOption struct {
 	// A unique reference
-	Reference            	string 	`json:"reference"`
+	Reference            	string 	`json:"reference,omitempty"`
 	// The name of the customer
-	CustomerName         	string 	`json:"customerName"`
+	CustomerName         	string 	`json:"customer_name"`
 	// The email of the customer
-	CustomerEmail        	string 	`json:"customerEmail"`
+	CustomerEmail        	string 	`json:"customer_email"`
 	// The to pay with e.g "USDT"
 	Coin                 	string 	`json:"coin"`
 	// The currency   e.g "USD"
 	Currency             	string 	`json:"currency"`
 	// The qmount to pay
-	Amount            		float64 `json:"cryptoAmount"`
+	FiatAmount            		float64 `json:"amount"`
 	// To accept partial payment defaults to false
-	AcceptPartialPayment 	bool   	`json:"accept_partial_payment"`
+	AcceptPartialPayment 	bool   	`json:"accept_partial_payment,omitempty"`
+	MetaDate				map[string]any `json:"metadata,omitempty"`
 }
 
 type paymentResponse struct {
@@ -56,19 +57,23 @@ const (
 // Initialize: This method initializes a new payment
 // @params {options}: Options needed to initialize a payment
 //@returns: returns a paymentResponse
-func (p *PaymentService) Initialize(options PaymentOption) (*paymentResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s", InitializeEndpoint)
+func (p *PaymentService) Initialize(options *PaymentOption) (*paymentResponse, error ) {
+	url := fmt.Sprintf( "%s%s", p.baseUrl, InitializeEndpoint)
 	if options.Reference == "" {
-		options.Reference = RandomString(12)
+		options.Reference = randomString(12)
 	}
 
 	var pay = new(paymentResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &pay)
+	req, err := p.Client.newRequest(http.MethodPost, url, options, p.Client.publicKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+	if err := do(req, &pay); err != nil {
+		return nil, err
+	}
+	
 
-	return pay, resp, nil
+	return pay, nil
 }
 
 
@@ -92,14 +97,9 @@ type verifyPaymentData struct {
 	Status 					string      `json:"status"`
 	Network  				string  	`json:"network"`
 	Blockchain 				string  	`json:"blockchain"`
-	Customer 		  		struct{
-		Id 					string 		`json:"id"`
-		CustomerName 		string  	`json:"customerName"`
-		CustomerEmail 		string 		`json:"customerEmail"`
-		CustomerPhone 		string  	`json:"customerPhone"`
-	}  									`json:"customer"`
-	PaymentLink				string 		`json:"paymentLink"`
-	PaymentButton  			string 		`json:"paymentButton"`
+	Customer 		  		map[string]any 	`json:"customer"`
+	PaymentLink				map[string]any 		`json:"paymentLink"`
+	PaymentButton  			map[string]any 		`json:"paymentButton"`
 	FeeInCrypto 			float64 	`json:"feeInCrypto"`
 }
 
@@ -111,17 +111,21 @@ type verifyPaymentResponse struct {
 // Verify: This verifies is to verify a payments
 // @params {identifier}: The unique id of the payment
 //@returns: returns a verifypaymentResponse
-func (p *PaymentService) Verify(identifier string) (*verifyPaymentResponse, *http.Response, error) {
-	url := fmt.Sprintf(p.baseUrl + "%s/%s", VerifyEndpoint, identifier)
+func (p *PaymentService) Verify(identifier string) (*verifyPaymentResponse, error) {
+	url := fmt.Sprintf("%s%s/%s", p.Client.baseUrl, VerifyEndpoint, identifier)
 	if identifier == "" {
-		return nil, nil, errors.New("please provide a reference or an identifier")
+		return nil, errors.New("please provide a reference or an identifier")
 	}
 
-	var verifyRes = new(verifyPaymentResponse)
-	resp, err := newRequest(http.MethodGet, url, nil, &verifyRes)
+	var verify = new(verifyPaymentResponse)
+	req, err := p.Client.newRequest(http.MethodGet, url, nil, p.Client.publicKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return verifyRes, resp, nil
+	if err := do(req, &verify); err != nil {
+		return nil, err
+	}
+	
+	return verify, nil
 }

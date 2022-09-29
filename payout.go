@@ -26,16 +26,20 @@ const (
 	bankPayoutEndponit 		= "api/v1/bank/payouts"
 )
 
-func (ps PayoutService) Crypto(options CryptoPayoutOptions) (*payoutResponse, *http.Response, error ) {
+func (ps PayoutService) Crypto(options CryptoPayoutOptions) (*payoutResponse, error ) {
 	url := fmt.Sprintf(ps.baseUrl + "%s", cryptoPayoutEndponit)
 
-	var payoutRes = new(payoutResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &payoutRes)
+	var payout = new(payoutResponse)
+	req, err := ps.Client.newRequest(http.MethodPost, url, options, ps.Client.secretKey)
 	if err != nil {
-		return nil, resp, err
+		return nil, err
 	}
 
-	return payoutRes, resp, nil
+	if err := do(req, &payout); err != nil {
+		return nil, err
+	}
+
+	return payout, nil
 }
 
 
@@ -65,7 +69,7 @@ type bankPayoutResponse struct {
 	Data  BankPayoutdata 	`json:"data"`
 }
 
-type BankPayoutOptions struct {
+type BankOptions struct {
 	BankName  		string    `json:"bank_name"`
 	BankCode  		string    `json:"bank_code"`
 	AccountName  	string    `json:"account_name"`
@@ -75,23 +79,27 @@ type BankPayoutOptions struct {
 	Default  		bool      `json:"default"`
 }
 
-// Create: creates a new payout bank account
+// Create: adds a new payout bank account
 // @params {options}: required options to create bank payout
-func (p *PayoutService) Create(options BankPayoutOptions) (*bankPayoutResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s", bankPayoutEndponit)
+func (ps *PayoutService) Create(options *BankOptions) (*bankPayoutResponse, error ) {
+	url := fmt.Sprintf(ps.baseUrl + "%s", bankPayoutEndponit)
 	
 	var bank = new(bankPayoutResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &bank)
+	req, err := ps.Client.newRequest(http.MethodPost, url, options, ps.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return bank, resp, nil
+	if err := do(req, &bank); err != nil {
+		return nil, err
+	}
+
+	return bank, nil
 }
 
 type PayoutOptions struct {
 	// The id of the bank to payout
-	BankPayoutId        string             `json:"bank_payout_id"`
+	BankId        string             `json:"bank_payout_id"`
 	// The coin to payout e.g "USDT"
 	Coin            	string             `json:"coin"`
 	// The amount to be payed out
@@ -99,63 +107,76 @@ type PayoutOptions struct {
 }
 
 // Initate: initates a new payout
-// @params {options}: required options to create bank payout
-func (p *PayoutService) Initiate(options PayoutOptions) (*payoutResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s/initiate", bankPayoutEndponit)
+// @params {options}: required options to initiate a bank payout
+func (ps *PayoutService) Initiate(options *PayoutOptions) (*payoutResponse, error ) {
+	url := fmt.Sprintf(ps.baseUrl + "%s/initiate", bankPayoutEndponit)
 	
-	var bank = new(payoutResponse)
-	resp, err := newRequest(http.MethodPost, url, options, &bank)
+	var payout = new(payoutResponse)
+	req, err := ps.Client.newRequest(http.MethodPost, url, options, ps.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return bank, resp, nil
+	if err := do(req, &payout); err != nil {
+		return nil, err
+	}
+
+	return payout, nil
 }
-
-
 // Update: updates an existing bank payout
 // @params {options}: required options to create bank payout
-func (p *PayoutService) Update(identifier string, options BankPayoutOptions) (*payoutResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s/%s", bankPayoutEndponit, identifier)
+func (ps *PayoutService) Update(identifier string, options *BankOptions) (*payoutResponse, error ) {
+	url := fmt.Sprintf(ps.baseUrl + "%s/%s", bankPayoutEndponit, identifier)
 	
-	var bank = new(payoutResponse)
-	resp, err := newRequest(http.MethodPatch, url, options, &bank)
+	var payout = new(payoutResponse)
+	req, err := ps.Client.newRequest(http.MethodPut, url, options, ps.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return bank, resp, nil
+	if err := do(req, &payout); err != nil {
+		return nil, err
+	}
+
+	return payout, nil
 }
 
 
 // Delete: deletes one or more existing bank payout using payout ids
 // @params {identifiers}: An array of string containing the ids
-func (p *PayoutService) Delete(identifiers []string) (*payoutResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s", bankPayoutEndponit)
+func (ps *PayoutService) Delete(identifiers []string) (*payoutResponse, error ) {
+	url := fmt.Sprintf(ps.baseUrl + "%s", bankPayoutEndponit)
 	payload := map[string]any{
 		"ids": identifiers,
 	}
-	var bank = new(payoutResponse)
-	resp, err := newRequest(http.MethodDelete, url, payload, &bank)
+	var payout = new(payoutResponse)
+	req, err := ps.Client.newRequest(http.MethodDelete, url, payload, ps.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return bank, resp, nil
+	if err := do(req, &payout); err != nil {
+		return nil, err
+	}
+
+	return payout, nil
 }
 
 // GetAll: retrieves all bank payouts
-// @params {identifiers}: An array of string containing the ids
-func (p *PayoutService) GetAll() (*payoutResponse, *http.Response, error ) {
-	url := fmt.Sprintf(p.baseUrl + "%s", bankPayoutEndponit)
+func (ps *PayoutService) GetAll() (*payoutResponse, error ) {
+	url := fmt.Sprintf(ps.baseUrl + "%s", bankPayoutEndponit)
 	
-	var bank = new(payoutResponse)
-	resp, err := newRequest(http.MethodGet, url, nil, &bank)
+	var payout = new(payoutResponse)
+	req, err := ps.Client.newRequest(http.MethodGet, url, nil, ps.Client.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return bank, resp, nil
+	if err := do(req, &payout); err != nil {
+		return nil, err
+	}
+
+	return payout, nil
 }
 
  
