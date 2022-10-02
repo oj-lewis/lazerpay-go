@@ -14,7 +14,7 @@ This is a Go client for interacting with the lazerpay API for quick crypto payme
     import (
         "log"
         
-        "github.com/oj-lewis/lazerpay-go/pkg"
+        "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -29,19 +29,19 @@ This is a Go client for interacting with the lazerpay API for quick crypto payme
 
 ## Availabe Methods on the sdk
 
-**1**. **Payments**
+**1**. **Payments 💵**
 - Initialize Payment
 - Verify Payment
 
-**2**. **Payout**
+**2**. **Payout 🏦**
 - Crypto Payout 
 - Bank Payout
 
-**3**. **Swap**
+**3**. **Swap ♻**
 - Crypto Swap 
 - Get Crypto swap amount out
 
-**4**. **Payment Links**
+**4**. **Payment Links 🔗**
 - Create payment links 
 - Get all payment links
 - Update payment links
@@ -57,7 +57,7 @@ customer
 import (
     "log"
 
-    "github.com/oj-lewis/lazerpay-go/pkg"
+    "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -77,7 +77,7 @@ func main() {
 	    Amount: 100,
 	    AcceptPartialPayment: true, // defaults to false	 	
     } 
-    resp, _, err := lazerpay.Payment.Initialize(payment_tx)
+    resp, err := lazerpay.Payment.Initialize(payment_tx)
     if err != nil {
         log.Fatal(err)
     }
@@ -92,7 +92,7 @@ This describes how to verify an initialized payment
 import (
     "log"
 
-    "github.com/oj-lewis/lazerpay-go/pkg"
+    "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -105,7 +105,7 @@ func main() {
 
     id := "the id generated from initializing the payment"
     
-    resp, _, err := lazerpay.Payment.Verify(id)
+    resp, err := lazerpay.Payment.Verify(id)
     if err != nil {
         log.Fatal(err)
     }
@@ -122,7 +122,7 @@ This describes how to withdraw the crypto in thier lazerpay balance.
 import (
     "log"
 
-    "github.com/oj-lewis/lazerpay-go/pkg"
+    "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -141,7 +141,7 @@ func main() {
         Blockchain: "Binance Smart Chain",
 	    	 	
     } 
-    resp, _, err := lazerpay.Payout.Crypto(payout_tx)
+    resp, err := lazerpay.Payout.Crypto(payout_tx)
     if err != nil {
         log.Fatal(err)
     }
@@ -155,7 +155,7 @@ This describes how to withdraw the crypto in thier lazerpay balance to their ban
 import (
     "log"
 
-    "github.com/oj-lewis/lazerpay-go/pkg"
+    "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -177,7 +177,7 @@ func main() {
     } 
 
     // creates a new payout bank
-    resp, _, err := lazerpay.Payout.Create(payout_tx)
+    resp, err := lazerpay.Payout.Create(payout_tx)
     if err != nil {
         log.Fatal(err)
     }
@@ -187,7 +187,7 @@ func main() {
 import (
     "log"
 
-    "github.com/oj-lewis/lazerpay-go/pkg"
+    "github.com/oj-lewis/lazerpay-go"
     )
 
 
@@ -205,7 +205,7 @@ func main() {
     } 
 
     // initiates a new bank payout
-    resp, _, err := lazerpay.Payout.Initiate(initiate_tx)
+    resp, err := lazerpay.Payout.Initiate(initiate_tx)
     if err != nil {
         log.Fatal(err)
     }
@@ -218,4 +218,4 @@ func main() {
 - Contact on twitter [@the_ojlewis](https://twitter.com/the_ojlewis)
 
 ## Contribution
-Contributions are welcome if there is an issue you can a new issue or create a pull request
+Contributions are welcome if there is any bug🐛, you can a new issue or create a pull request

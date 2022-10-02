@@ -26,7 +26,7 @@ const (
 	bankPayoutEndponit 		= "api/v1/bank/payouts"
 )
 
-func (ps PayoutService) Crypto(options CryptoPayoutOptions) (*payoutResponse, error ) {
+func (ps PayoutService) Crypto(options *CryptoPayoutOptions) (*payoutResponse, error ) {
 	url := fmt.Sprintf(ps.baseUrl + "%s", cryptoPayoutEndponit)
 
 	var payout = new(payoutResponse)
@@ -44,24 +44,24 @@ func (ps PayoutService) Crypto(options CryptoPayoutOptions) (*payoutResponse, er
 
 
 type BankPayoutdata struct {
-	BankName string 		         `json:"bankName"`
-	AccountName string    `json:"accountName"`
-	AccountType string  `json:"accountType"`
-	RoutingNumber string  `json:"routingNumber"`
-	Currency  string  `json:"currency"`
-	Country  string  `json:"country"`
-	State  string  `json:"state"`
-	City  string  `json:"city"`
-	Address  string  `json:"address"`
-	PostalCode  string  `json:"postalCode"`
-	Network  string  `json:"network"`
-	Default  bool  `json:"default"`
-	Deleted  bool  `json:"deleted"`
-	Street  string  `json:"strret"`
-	Id  string  `json:"id"`
-	Status  string  `json:"status"`
-	CreatedAt  string  `json:"createdAt"`
-	UpdatedAt  string  `json:"updatedAt"`
+	BankName 		string 	`json:"bankName"`
+	AccountName 	string  `json:"accountName"`
+	AccountType 	string  `json:"accountType"`
+	RoutingNumber 	string  `json:"routingNumber"`
+	Currency  		string  `json:"currency"`
+	Country  		string  `json:"country"`
+	State  			string  `json:"state"`
+	City  			string  `json:"city"`
+	Address  		string  `json:"address"`
+	PostalCode  	string  `json:"postalCode"`
+	Network  		string  `json:"network"`
+	Default  		bool  	`json:"default"`
+	Deleted  		bool  	`json:"deleted"`
+	Street  		string  `json:"strret"`
+	Id  			string  `json:"id"`
+	Status  		string  `json:"status"`
+	CreatedAt  		string  `json:"createdAt"`
+	UpdatedAt  		string  `json:"updatedAt"`
 }
 
 type bankPayoutResponse struct {

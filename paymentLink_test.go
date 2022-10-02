@@ -1,65 +1,116 @@
 package lazerpay
 
-// import (
-// 	"testing"
-// )
+import (
+	"testing"
 
-// func TestPaymentLinkCreate(t *testing.T) {
+	"github.com/stretchr/testify/require"
+)
 
-// 	tests := []struct {
-// 		Name   string
-// 		expected  *LinkResponse
-// 		data    LinkOptions
-// 	}{
-// 		{
-// 			Name: "create payment link",
-// 			expected: new(LinkResponse),
-// 			data: LinkOptions{
+func TestPaymentLink_Create(t *testing.T) {
 
-// 			},
-// 		},
-// 		// {
-// 		// 	Name: "payment verification test",
-// 		// 	expected: new(PaymentLinkResponse),
-// 		// 	data: &PaymentLinkData{
+	tests := []struct {
+		Name   string
+		expected  *LinkResponse
+		data    *LinkOptions
+	}{
+		{
+			Name: "create payment link with charge",
+			expected: new(LinkResponse),
+			data: &LinkOptions{
+				Title: "test payment link",
+				Description: "payment link test",
+				Options: options{
+					CollectPhone: false,
+					CollectAddress: false,
+					AllowPromo: false,
+				},
+				Cart: cart{},
+				Charge: charge{
+					Amount: 3000,
+					Currency: "USD",
+				},
 
-// 		// 	},
-// 		// },
-// 	}
+			},
+		},
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.Name, func(t *testing.T) {
-// 			client, _ := NewClient("test", "test")
-// 			resp, _, _ := client.PaymentLink.Create(tt.data)
-// 			if resp != tt.expected {
-// 				t.Errorf("want: %v, got: %v", tt.expected, resp)
-// 			}
-// 		})
-// 	}
+		{
+			Name: "create payment link with cart",
+			expected: new(LinkResponse),
+			data: &LinkOptions{
+				Title: "test payment link",
+				Description: "payment link test",
+				Options: options{
+					CollectPhone: false,
+					CollectAddress: false,
+					AllowPromo: false,
+				},
+				Cart: cart{
+					Quantity: 10,
+					QuantityAdjustable: true,
+				},
+				Charge: charge{},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			client, _ := NewClient("test", "test")
+			resp, err := client.PaymentLink.Create(tt.data)
+
+			require.Nil(t, err)
+			require.Equal(t, tt.expected, resp)
+			
+		})
+	}
 	
-// }
+}
 
-// func TestPaymentLinkGetLinks(t *testing.T) {
+func TestPaymentLink_GetLinks(t *testing.T) {
 
-// 	tests := []struct {
-// 		Name   string
-// 		expected  []*ListLinksResponse
-// 		data    *PaymentLinkData
-// 	}{
-// 		{
-// 			Name: "list all payment links",
-// 			expected: make([]*ListLinksResponse, 4),
-// 		},
-// 	}
+	tests := struct {
+		Name   string
+		expected  []*ListLinksResponse
+		data    *PaymentLinkData
+	}{
+		
+		Name: "Get all payment links",
+		expected: make([]*ListLinksResponse, 4),
+	}
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.Name, func(t *testing.T) {
-// 			client, _ := NewClient("test", "test")
-// 			resp, _, _ := client.PaymentLink.GetAll()
-// 			if resp != nil {
-// 				t.Errorf("want: %v, got: %v", tt.expected, resp)
-// 			}
-// 		})
-// 	}
+	t.Run(tests.Name, func(t *testing.T) {
+		client, _ := NewClient("test", "test")
+		resp, err := client.PaymentLink.GetAll()
+
+		require.Nil(t, err)
+		require.Equal(t, tests.expected, resp)
+	})
 	
-// }
+	
+}
+
+func TestPaymentLink_Get(t *testing.T) {
+	t.Run("Get a payment link by id ", func(t *testing.T) {
+		client, _ := NewClient("test", "test")
+		resp, err := client.PaymentLink.Get("id")
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+	})
+}
+
+
+func TestPaymentLink_Update(t *testing.T) {
+	data := &LinkOptions{
+		Title: "updated title",
+		Description: "updated description",
+	}
+
+	t.Run("Get a payment link by id ", func(t *testing.T) {
+		client, _ := NewClient("test", "test")
+		resp, err := client.PaymentLink.Update(data)
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+	})
+}

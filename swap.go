@@ -10,15 +10,15 @@ type Swapservice service
 
 type SwapOptions struct {
 	// A unique reference
-	Reference           string          `json:"reference"`
+	Reference   string          `json:"reference"`
 	// Amount to swap
-	Amount      		int				`json:"amount"`
+	Amount      int				`json:"amount"`
 	// The crypto to swap from
-	FromCoin				string			`json:"from_coin"`
+	FromCoin	string			`json:"from_coin"`
 	// The crypto to swap to
-	ToCoin					string			`json:"to_coin"`
+	ToCoin		string			`json:"to_coin"`
 	// The blockchain you are sending to
-	Blockchain			string			`json:"blockchain"`
+	Blockchain	string			`json:"blockchain"`
 }
 
 type SwapResponse struct {
@@ -26,10 +26,12 @@ type SwapResponse struct {
 }
 type SwapAmountResponse struct {
 	apiStatus
-	Data   struct{
-		FromCoin  	string  `json:"fromCoin"`
-		ToCoin  	string  `json:"toCoin"`
-	} 						`json:"data"`
+	Data	swapData	`json:"data"`
+}
+
+type swapData struct {
+	FromCoin  	string  `json:"fromCoin"`
+	ToCoin  	string  `json:"toCoin"`
 }
 
 const (
@@ -38,7 +40,7 @@ const (
 
 // SwapCrypto: swaps one coin to another
 // @params {options}: swap options
-func (s Swapservice)  SwapCrypto(options SwapOptions) (*SwapResponse, error ) {
+func (s Swapservice)  SwapCrypto(options *SwapOptions) (*SwapResponse, error ) {
 	url := fmt.Sprintf(s.baseUrl + "%s/crypto", swapCryptoEndpoint)
 	if options.Reference == "" {
 		options.Reference = randomString(12)
@@ -59,7 +61,7 @@ func (s Swapservice)  SwapCrypto(options SwapOptions) (*SwapResponse, error ) {
 
 // GetSwapAmout: retuns the amount to be recieved on swap
 // @params {options}: swap options
-func (s Swapservice) GetSwapAmount(options SwapOptions) (*SwapAmountResponse, error) {
+func (s Swapservice) GetSwapAmount(options *SwapOptions) (*SwapAmountResponse, error) {
 	url := fmt.Sprintf(s.baseUrl + "%s/crypto/amount-out", swapCryptoEndpoint)
 	
 	var swap = new(SwapAmountResponse)
