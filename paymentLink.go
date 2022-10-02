@@ -26,25 +26,32 @@ type PaymentLinkData struct {
 }
 
 type LinkOptions struct{
-	Title 				string 			`json:"title"`
-	Description  		string 			`json:"description"`
-	Options  			struct{
-		CollectPhone 	bool 			`json:"collect_phone"`
-		AllowPromo 		bool 			`json:"allow_promo"`
-		CollectAddress  bool 			`json:"collect_address"`
-	} 									`json:"options"`
-
-	Cart     			struct{
-		PriceId  					string 	`json:"price_id"`
-		Quantity   int   `json:"quantity"`
-		QuantityAdjustable   bool   `json:"quantity_adjustable"`
-	}									`json:"cart"`
-
-	Charge    	   		struct{
-		Amount  		int64 			`json:"amount"`
-		Currency  		string   		`json:"currency"`
-	} 									`json:"charge"`
+	Title 			string 		`json:"title"`
+	Description  	string 		`json:"description"`
+	Options  		options		`json:"options"`
+	Cart 			cart		`json:"cart"`
+	Charge    		charge		`json:"charge"`
 }
+
+type options struct {
+	CollectPhone 	bool 			`json:"collect_phone"`
+	AllowPromo 		bool 			`json:"allow_promo"`
+	CollectAddress  bool 			`json:"collect_address"`
+}
+
+type charge struct{
+	Amount  		int64 			`json:"amount"`
+	Currency  		string   		`json:"currency"`
+}
+
+type cart struct{
+	PriceId  			 string 	`json:"price_id"`
+	Quantity   			 int    	`json:"quantity"`
+	QuantityAdjustable   bool   	`json:"quantity_adjustable"`
+}
+
+
+
 
 type LinkResponse struct {
 	apiStatus
@@ -57,7 +64,7 @@ const (
 
 // Create: create a new standrad payment link
 // @params {options}: the required options to create a payment link
-func (p *PaymentLinkService) Create(options LinkOptions) (*LinkResponse, error ) {
+func (p *PaymentLinkService) Create(options *LinkOptions) (*LinkResponse, error ) {
 	url := fmt.Sprintf(p.baseUrl + "%s/standard", paymentLinkEndpoint)
 
 	var link = new(LinkResponse)
@@ -75,7 +82,7 @@ func (p *PaymentLinkService) Create(options LinkOptions) (*LinkResponse, error )
 
 // Update: updates a standrad payment link
 // @params {options}: the required options to be updated
-func (p *PaymentLinkService) Update(options LinkOptions) (*LinkResponse, error) {
+func (p *PaymentLinkService) Update(options *LinkOptions) (*LinkResponse, error) {
 	url := fmt.Sprintf(p.baseUrl + "%s/standard", paymentLinkEndpoint)
 	
 	var link = new(LinkResponse)
