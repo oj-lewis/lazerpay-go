@@ -1,6 +1,7 @@
 package lazerpay
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +16,7 @@ func TestSwap_SwapCrypto(t *testing.T) {
 	}
 
 	t.Run("swap crypto", func(t *testing.T) {
-		client, _ := NewClient("test", "test")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 
 		resp, err := client.Swap.SwapCrypto(data)
 
@@ -33,7 +34,7 @@ func TestSwap_GetSwapAmount(t *testing.T) {
 	}
 
 	t.Run("swap crypto", func(t *testing.T) {
-		client, _ := NewClient("test", "test")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 
 		resp, err := client.Swap.SwapCrypto(data)
 

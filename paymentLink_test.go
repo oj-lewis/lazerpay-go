@@ -1,6 +1,7 @@
 package lazerpay
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -55,7 +56,7 @@ func TestPaymentLink_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			client, _ := NewClient("test", "test")
+			client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 			resp, err := client.PaymentLink.Create(tt.data)
 
 			require.Nil(t, err)
@@ -79,7 +80,7 @@ func TestPaymentLink_GetLinks(t *testing.T) {
 	}
 
 	t.Run(tests.Name, func(t *testing.T) {
-		client, _ := NewClient("test", "test")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 		resp, err := client.PaymentLink.GetAll()
 
 		require.Nil(t, err)
@@ -91,7 +92,7 @@ func TestPaymentLink_GetLinks(t *testing.T) {
 
 func TestPaymentLink_Get(t *testing.T) {
 	t.Run("Get a payment link by id ", func(t *testing.T) {
-		client, _ := NewClient("test", "test")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 		resp, err := client.PaymentLink.Get("id")
 
 		require.Nil(t, err)
@@ -107,7 +108,7 @@ func TestPaymentLink_Update(t *testing.T) {
 	}
 
 	t.Run("Get a payment link by id ", func(t *testing.T) {
-		client, _ := NewClient("test", "test")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 		resp, err := client.PaymentLink.Update(data)
 
 		require.Nil(t, err)

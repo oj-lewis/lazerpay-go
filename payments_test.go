@@ -1,16 +1,19 @@
 package lazerpay
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 )
+
+var _ = godotenv.Load()
 
 func TestPayment_Initailize(t *testing.T) {
 	t.Run("initialize", func(t *testing.T) {
 
-		client, _ := NewClient("pk_test_uuZfeK8QvsE69QnLIdujfAIlyl94pOmQ2UFXmk824U1m82VsPu", "sk_test_Ga2alceNHwWriPJWgJpEu2VYZlsLYnEZxjhwZH8N3kYLC5kioFsk_test_Ga2alceNHwWriPJWgJpEu2VYZlsLYnEZxjhwZH8N3kYLC5kioF")
+		client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 		data := &PaymentOption{
 			CustomerName: "omiete",
 			CustomerEmail: "omiete@example.com",
@@ -48,7 +51,7 @@ func TestPayments_Verify(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			client, _ := NewClient("pk_test_uuZfeK8QvsE69QnLIdujfAIlyl94pOmQ2UFXmk824U1m82VsPu", "sk_test_Ga2alceNHwWriPJWgJpEu2VYZlsLYnEZxjhwZH8N3kYLC5kioF")
+			client, _ := NewClient(os.Getenv("TEST_PUBLIC_KEY"), os.Getenv("TEST_SECRET_KEY"))
 			resp, err := client.Payment.Verify(tt.data)
 	
 			require.Nil(t, err)
